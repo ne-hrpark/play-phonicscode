@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 배경 원 -->
+  <circle cx="50" cy="50" r="48" fill="#FF6B9D" stroke="#E04A7A" stroke-width="2"/>
+  
+  <!-- 귀여운 캐릭터 얼굴 -->
+  <!-- 머리 (더 크게) -->
+  <circle cx="50" cy="50" r="32" fill="#FFE5B4" stroke="#FFD4A3" stroke-width="1.5"/>
+  
+  <!-- 왼쪽 귀 -->
+  <ellipse cx="28" cy="25" rx="10" ry="14" fill="#FFE5B4" stroke="#FFD4A3" stroke-width="1.5"/>
+  <ellipse cx="28" cy="25" rx="6" ry="10" fill="#FFB6C1"/>
+  
+  <!-- 오른쪽 귀 -->
+  <ellipse cx="72" cy="25" rx="10" ry="14" fill="#FFE5B4" stroke="#FFD4A3" stroke-width="1.5"/>
+  <ellipse cx="72" cy="25" rx="6" ry="10" fill="#FFB6C1"/>
+  
+  <!-- 왼쪽 눈 (더 크게) -->
+  <circle cx="42" cy="48" r="5.5" fill="#333"/>
+  <circle cx="43.5" cy="46.5" r="2" fill="#FFF"/>
+  
+  <!-- 오른쪽 눈 (더 크게) -->
+  <circle cx="58" cy="48" r="5.5" fill="#333"/>
+  <circle cx="59.5" cy="46.5" r="2" fill="#FFF"/>
+  
+  <!-- 눈썹 -->
+  <path d="M 38 42 Q 42 40 46 42" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 54 42 Q 58 40 62 42" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  
+  <!-- 코 (더 크게) -->
+  <ellipse cx="50" cy="53" rx="2.5" ry="3" fill="#FFB6C1"/>
+  
+  <!-- 입 (웃는 모습, 더 크게) -->
+  <path d="M 42 58 Q 50 64 58 58" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  
+  <!-- 볼 홍조 (더 크게) -->
+  <circle cx="32" cy="55" r="5" fill="#FFB6C1" opacity="0.6"/>
+  <circle cx="68" cy="55" r="5" fill="#FFB6C1" opacity="0.6"/>
+  
+  <!-- 장식 별 (작게) -->
+  <path d="M 15 15 L 16 18 L 19 18 L 16.5 20 L 17.5 23 L 15 21 L 12.5 23 L 13.5 20 L 11 18 L 14 18 Z" fill="#FFD700" opacity="0.8"/>
+  <path d="M 85 15 L 86 18 L 89 18 L 86.5 20 L 87.5 23 L 85 21 L 82.5 23 L 83.5 20 L 81 18 L 84 18 Z" fill="#FFD700" opacity="0.8"/>
+</svg>
