@@ -7,7 +7,8 @@ import ShadowPuzzle from './pages/ShadowPuzzle';
 
 function App() {
   return (
-    <BrowserRouter>
+    // Vite의 base 설정(/ 또는 /play-phonicscode/)에 맞춰 라우터 기준 경로를 자동으로 맞춘다.
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/select-unit" element={<SelectUnit />} />

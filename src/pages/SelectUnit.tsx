@@ -43,7 +43,14 @@ const SelectUnit = () => {
 
   useEffect(() => {
     // 엑셀에서 유닛 데이터 로드
-    loadUnitDataFromExcel('/data/unit_data.xlsx')
+    // PROD에서는 외부 CDN 경로(VITE_UNIT_DATA_CDN_URL)가 설정되어 있으면 그걸 사용,
+    // 아니면 기본적으로 현재 앱의 /data/unit_data.xlsx 사용
+    const cdnUrl = (import.meta as any).env.VITE_UNIT_DATA_CDN_URL as string | undefined;
+    const filePath =
+      import.meta.env.PROD && cdnUrl
+        ? cdnUrl
+        : `${import.meta.env.BASE_URL}data/unit_data.xlsx`;
+    loadUnitDataFromExcel(filePath)
       .then((data) => {
         const levelUnits = getUnitsByLevel(data, bookSeq);
         setUnits(levelUnits);
