@@ -176,9 +176,15 @@ const ShadowPuzzle = () => {
     initTutorialState();
 
     // 엑셀 데이터 로드
-    // console.log('=== 엑셀 데이터 로드 시작 ===');
-    // console.log('파일 경로: /data/quiz_data.xls');
-    loadQuizDataFromExcel('/data/quiz_data.xls')
+    // PROD에서는 외부 CDN 경로(VITE_QUIZ_DATA_CDN_URL)가 설정되어 있으면 그걸 사용,
+    // 아니면 현재 앱의 BASE_URL을 기준으로 /data/quiz_data.xls 사용
+    const quizCdnUrl = (import.meta as any).env.VITE_QUIZ_DATA_CDN_URL as string | undefined;
+    const quizFilePath =
+      import.meta.env.PROD && quizCdnUrl
+        ? quizCdnUrl
+        : `${import.meta.env.BASE_URL}data/quiz_data.xls`;
+
+    loadQuizDataFromExcel(quizFilePath)
       .then((data) => {
         // console.log('엑셀 데이터 로드 성공:', data);
         // console.log('로드된 데이터 개수:', data.length);
