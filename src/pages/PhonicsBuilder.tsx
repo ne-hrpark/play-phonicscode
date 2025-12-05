@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { initCommonScripts } from '../utils/common';
 import { loadQuizDataFromExcel, findQuizData, getLastSequences, getLastProblemNumberForUnit, getRandomOptions, type QuizData } from '../utils/excelData';
@@ -88,13 +88,37 @@ function setCookie(name: string, value: string, days: number) {
 }
 
 
+type PhonicsBuilderParams = {
+  level?: string;
+  unit?: string;
+  problemNumber?: string;
+};
+
 const PhonicsBuilder = () => {
   const navigate = useNavigate();
+  const { level: levelParam, unit: unitParam, problemNumber: problemNumberParam } =
+    useParams<PhonicsBuilderParams>();
   const [searchParams] = useSearchParams();
+
   // URL 파라미터는 기존과 호환성을 위해 유지하되, 내부적으로는 level, unit, problem_number 사용
-  const level = searchParams.get('book_seq') || searchParams.get('level') || '1'; // book_seq를 level로 매핑
-  const unit = searchParams.get('unit_seq') || searchParams.get('unit') || '1';
-  const problemNumber = searchParams.get('quiz_seq') || searchParams.get('problem_number') || '1';
+  // 1순위: path 파라미터 /phonics-builder/:level/:unit/:problemNumber
+  // 2순위: 쿼리 파라미터 ?book_seq=&unit_seq=&quiz_seq= (혹은 level/unit/problem_number)
+  // 3순위: 기본값
+  const level =
+    levelParam ||
+    searchParams.get('book_seq') ||
+    searchParams.get('level') ||
+    '1'; // book_seq를 level로 매핑
+  const unit =
+    unitParam ||
+    searchParams.get('unit_seq') ||
+    searchParams.get('unit') ||
+    '1';
+  const problemNumber =
+    problemNumberParam ||
+    searchParams.get('quiz_seq') ||
+    searchParams.get('problem_number') ||
+    '1';
 
   const [showTutorial, setShowTutorial] = useState(false);
   const [showUnitIntro, setShowUnitIntro] = useState(false);
@@ -125,7 +149,9 @@ const PhonicsBuilder = () => {
         if (target && (target.id === 'btnClose' || target.closest('#btnClose'))) {
           e.preventDefault();
           e.stopPropagation();
-          navigate(`/select-play?book_seq=${level}&unit_seq=${unit}`);
+          // 기존 쿼리 방식: /select-play?book_seq=&unit_seq=
+          // 새로운 라우트 방식: /select-play/:bookSeq/:unitSeq
+          navigate(`/select-play/${level}/${unit}`);
         }
       };
 
@@ -192,7 +218,7 @@ const PhonicsBuilder = () => {
   };
 
   const handleClose = () => {
-    navigate(`/select-play?book_seq=${level}&unit_seq=${unit}`);
+    navigate(`/select-play/${level}/${unit}`);
   };
 
   const getQuizInfo = (levelStr: string, unitStr: string, problemNumberStr: string, isUnitFirst = true, data: QuizData[] = quizDataList) => {
@@ -268,8 +294,30 @@ const PhonicsBuilder = () => {
 
     // ASP 로직과 동일하게 단어를 문자 하나씩 순회하면서 슬롯 삽입
     const word = quizData.word;
-    const slotStartIdx = quizData.slot_char_start; // 1-based index (ASP의 rs_slot_start_idx + 1과 동일)
-    const slotSize = quizData.slot_char_end - quizData.slot_char_start + 1; // 슬롯 크기
+
+    // 슬롯 인덱스 정규화 (엑셀 데이터 오류 대비)
+    //  - 1보다 작은 값은 1로
+    //  - 끝 인덱스가 시작보다 작으면 시작과 동일하게
+    //  - 단어 길이를 벗어나면 마지막 글자로 보정
+    let slotStartIdx = quizData.slot_char_start; // 1-based index (ASP의 rs_slot_start_idx + 1과 동일)
+    let slotEndIdx = quizData.slot_char_end;
+
+    if (!Number.isFinite(slotStartIdx) || slotStartIdx < 1) {
+      slotStartIdx = 1;
+    }
+    if (!Number.isFinite(slotEndIdx) || slotEndIdx < slotStartIdx) {
+      slotEndIdx = slotStartIdx;
+    }
+    if (word.length > 0) {
+      if (slotStartIdx > word.length) {
+        slotStartIdx = word.length;
+      }
+      if (slotEndIdx > word.length) {
+        slotEndIdx = word.length;
+      }
+    }
+
+    const slotSize = Math.max(1, slotEndIdx - slotStartIdx + 1); // 최소 1 이상으로 보장
     const colorStartIdx = quizData.color_display_start || 0; // 1-based index
     const colorSize = quizData.color_display_count || 0;
 
@@ -838,7 +886,7 @@ const PhonicsBuilder = () => {
   };
 
   const handleQuizFinalClose = () => {
-    navigate(`/select-play?book_seq=${level}&unit_seq=${unit}`);
+    navigate(`/select-play/${level}/${unit}`);
   };
 
   return (

@@ -110,25 +110,43 @@ export function getRandomOptions(
   currentAnswerPhonetic: string,
   count: number = 4
 ): string[] {
-  // 같은 레벨, 같은 유닛의 모든 문제들
+  // 후보 음가 수집을 위한 헬퍼
+  const collectPhonetics = (items: QuizData[]) =>
+    items
+      .map((item) => item.answer_phonetic)
+      .filter((phonetic) => phonetic && phonetic !== currentAnswerPhonetic);
+
+  // 1) 기본: 같은 레벨, 같은 유닛에서 후보 수집
   const sameLevelUnit = data.filter(
     (item) => item.level === currentLevel && item.unit === currentUnit
   );
+  let candidates = collectPhonetics(sameLevelUnit);
 
-  // 정답을 제외한 다른 음가들
-  const otherPhonetics = sameLevelUnit
-    .map((item) => item.answer_phonetic)
-    .filter((phonetic) => phonetic && phonetic !== currentAnswerPhonetic)
-    .filter((value, index, self) => self.indexOf(value) === index); // 중복 제거
+  // 2) 유닛 안에 다양한 음가가 거의 없으면 → 같은 레벨 전체에서 추가로 수집
+  if (candidates.length < count) {
+    const sameLevel = data.filter((item) => item.level === currentLevel);
+    candidates = candidates.concat(collectPhonetics(sameLevel));
+  }
+
+  // 3) 그래도 부족하면 → 전체 데이터에서 추가로 수집
+  if (candidates.length < count) {
+    candidates = candidates.concat(collectPhonetics(data));
+  }
+
+  // 중복 제거
+  const uniqueCandidates = Array.from(new Set(candidates));
 
   // 랜덤으로 섞기
-  const shuffled = [...otherPhonetics].sort(() => Math.random() - 0.5);
+  const shuffled = [...uniqueCandidates].sort(() => Math.random() - 0.5);
 
-  // 필요한 개수만큼 선택 (부족하면 반복)
+  // 필요한 개수만큼 선택 (후보가 모자라면 가능한 만큼만 사용 후, 남은 개수는 반복 채우기)
   const selected: string[] = [];
-  for (let i = 0; i < count; i++) {
-    if (shuffled.length > 0) {
-      selected.push(shuffled[i % shuffled.length]);
+  if (shuffled.length > 0) {
+    for (let i = 0; i < Math.min(count, shuffled.length); i++) {
+      selected.push(shuffled[i]);
+    }
+    while (selected.length < count) {
+      selected.push(shuffled[selected.length % shuffled.length]);
     }
   }
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { initCommonScripts } from '../utils/common';
 import { loadQuizDataFromExcel, findQuizData, getLastSequences, getLastProblemNumberForUnit, type QuizData } from '../utils/excelData';
@@ -87,12 +87,36 @@ const playAudio = (src: string | null, onEnded?: () => void) => {
     });
 };
 
+type ShadowPuzzleParams = {
+  level?: string;
+  unit?: string;
+  problemNumber?: string;
+};
+
 const ShadowPuzzle = () => {
   const navigate = useNavigate();
+  const { level: levelParam, unit: unitParam, problemNumber: problemNumberParam } =
+    useParams<ShadowPuzzleParams>();
   const [searchParams] = useSearchParams();
-  const level = searchParams.get('book_seq') || searchParams.get('level') || '1';
-  const unit = searchParams.get('unit_seq') || searchParams.get('unit') || '1';
-  const problemNumber = searchParams.get('quiz_seq') || searchParams.get('problem_number') || '1';
+
+  // 1순위: path 파라미터 /shadow-puzzle/:level/:unit/:problemNumber
+  // 2순위: 쿼리 파라미터 ?book_seq=&unit_seq=&quiz_seq= (혹은 level/unit/problem_number)
+  // 3순위: 기본값
+  const level =
+    levelParam ||
+    searchParams.get('book_seq') ||
+    searchParams.get('level') ||
+    '1';
+  const unit =
+    unitParam ||
+    searchParams.get('unit_seq') ||
+    searchParams.get('unit') ||
+    '1';
+  const problemNumber =
+    problemNumberParam ||
+    searchParams.get('quiz_seq') ||
+    searchParams.get('problem_number') ||
+    '1';
 
   const [showTutorial, setShowTutorial] = useState(false);
   const [showUnitIntro, setShowUnitIntro] = useState(false);
@@ -122,7 +146,9 @@ const ShadowPuzzle = () => {
         if (target && (target.id === 'btnClose' || target.closest('#btnClose'))) {
           e.preventDefault();
           e.stopPropagation();
-          navigate(`/select-play?book_seq=${currentLevel}&unit_seq=${currentUnit}`);
+          // 기존 쿼리 방식: /select-play?book_seq=&unit_seq=
+          // 새로운 라우트 방식: /select-play/:bookSeq/:unitSeq
+          navigate(`/select-play/${currentLevel}/${currentUnit}`);
         }
       };
 
@@ -362,14 +388,14 @@ const ShadowPuzzle = () => {
       const quizContainer = document.getElementById('quizContainer');
       if (quizContainer) {
         // 기존 이벤트 리스너 제거 후 새로 등록
-        const handleCloseClick = (e: Event) => {
-          const target = e.target as HTMLElement;
-          if (target && (target.id === 'btnClose' || target.closest('#btnClose'))) {
-            e.preventDefault();
-            e.stopPropagation();
-            navigate(`/select-play?book_seq=${levelStr}&unit_seq=${unitStr}`);
-          }
-        };
+          const handleCloseClick = (e: Event) => {
+            const target = e.target as HTMLElement;
+            if (target && (target.id === 'btnClose' || target.closest('#btnClose'))) {
+              e.preventDefault();
+              e.stopPropagation();
+              navigate(`/select-play/${levelStr}/${unitStr}`);
+            }
+          };
         
         // 기존 리스너 제거
         quizContainer.removeEventListener('click', handleCloseClick);
@@ -638,7 +664,7 @@ const ShadowPuzzle = () => {
   };
 
   const handleQuizFinalClose = () => {
-    navigate(`/select-play?book_seq=${level}&unit_seq=${unit}`);
+    navigate(`/select-play/${level}/${unit}`);
   };
 
   return (

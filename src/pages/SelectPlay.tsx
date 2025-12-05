@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { initCommonScripts } from '../utils/common';
 import { loadUnitDataFromExcel, getUnitsByLevel } from '../utils/unitData';
 
@@ -9,11 +9,21 @@ declare global {
   }
 }
 
+type SelectPlayParams = {
+  bookSeq?: string;
+  unitSeq?: string;
+};
+
 const SelectPlay = () => {
   const navigate = useNavigate();
+  const { bookSeq: bookSeqParam, unitSeq: unitSeqParam } = useParams<SelectPlayParams>();
   const [searchParams] = useSearchParams();
-  const bookSeq = searchParams.get('book_seq') || '1';
-  const unitSeq = searchParams.get('unit_seq') || '1';
+
+  // 1순위: path 파라미터 /select-play/:bookSeq/:unitSeq
+  // 2순위: 쿼리 파라미터 ?book_seq=&unit_seq=
+  // 3순위: 기본값
+  const bookSeq = bookSeqParam || searchParams.get('book_seq') || '1';
+  const unitSeq = unitSeqParam || searchParams.get('unit_seq') || '1';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentUnitName, setCurrentUnitName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -72,7 +82,9 @@ const SelectPlay = () => {
   };
 
   const handleBack = () => {
-    navigate(`/select-unit?book_seq=${bookSeq}`);
+    // 기존 쿼리 방식: /select-unit?book_seq=1
+    // 새로운 라우트 방식: /select-unit/1
+    navigate(`/select-unit/${bookSeq}`);
   };
 
 
@@ -121,7 +133,9 @@ const SelectPlay = () => {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate(`/phonics-builder?book_seq=${bookSeq}&unit_seq=${unitSeq}&quiz_seq=1`);
+                  // 기존 쿼리 방식: /phonics-builder?book_seq=1&unit_seq=2&quiz_seq=1
+                  // 새로운 라우트 방식: /phonics-builder/1/2/1
+                  navigate(`/phonics-builder/${bookSeq}/${unitSeq}/1`);
                 }}
               >
                 <span className="eyes eyes1"></span>
@@ -149,7 +163,9 @@ const SelectPlay = () => {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate(`/shadow-puzzle?book_seq=${bookSeq}&unit_seq=${unitSeq}&quiz_seq=1`);
+                  // 기존 쿼리 방식: /shadow-puzzle?book_seq=1&unit_seq=2&quiz_seq=1
+                  // 새로운 라우트 방식: /shadow-puzzle/1/2/1
+                  navigate(`/shadow-puzzle/${bookSeq}/${unitSeq}/1`);
                 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="239.919" height="148.018" viewBox="0 0 239.919 148.018">

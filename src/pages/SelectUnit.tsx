@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import { initCommonScripts } from '../utils/common';
 import { loadUnitDataFromExcel, getUnitsByLevel, type UnitData } from '../utils/unitData';
@@ -11,10 +11,19 @@ declare global {
   }
 }
 
+type SelectUnitParams = {
+  bookSeq?: string;
+};
+
 const SelectUnit = () => {
   const navigate = useNavigate();
+  const { bookSeq: bookSeqParam } = useParams<SelectUnitParams>();
   const [searchParams] = useSearchParams();
-  const bookSeq = parseInt(searchParams.get('book_seq') || '1', 10);
+
+  // 1순위: path 파라미터 /select-unit/:bookSeq
+  // 2순위: 쿼리 파라미터 ?book_seq=1
+  // 3순위: 기본값 1
+  const bookSeq = parseInt(bookSeqParam || searchParams.get('book_seq') || '1', 10);
   const swiperRef = useRef<any>(null);
   const autoEyeTimerRef = useRef<number | null>(null);
   const directionRef = useRef<number>(1);
@@ -318,7 +327,9 @@ const SelectUnit = () => {
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          navigate(`/select-play?book_seq=${bookSeq}&unit_seq=${unit.unit}`);
+                          // 기존 쿼리 방식: /select-play?book_seq=1&unit_seq=2
+                          // 새로운 라우트 방식: /select-play/1/2
+                          navigate(`/select-play/${bookSeq}/${unit.unit}`);
                         }}
                       >
                         <span className="tit_unit">Unit</span>

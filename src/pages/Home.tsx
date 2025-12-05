@@ -19,7 +19,7 @@ const Home = () => {
   useEffect(() => {
     // 공통 스크립트 초기화
     initCommonScripts();
-    
+
     // jQuery 초기화 (jQuery가 로드된 후)
     if (window.$ || window.jQuery) {
       initWithJQuery();
@@ -31,11 +31,11 @@ const Home = () => {
           clearInterval(checkJQuery);
         }
       }, 100);
-      
+
       // 5초 후 타임아웃
       setTimeout(() => clearInterval(checkJQuery), 5000);
     }
-    
+
     // Swiper 초기화
     if (window.Swiper) {
       new window.Swiper('.swiper', {
@@ -66,7 +66,9 @@ const Home = () => {
   }, []);
 
   const handleBookClick = (bookSeq: number) => {
-    navigate(`/select-unit?book_seq=${bookSeq}`);
+    // 기존 쿼리 방식: /select-unit?book_seq=1
+    // 새로운 라우트 방식: /select-unit/1
+    navigate(`/select-unit/${bookSeq}`);
   };
 
   return (
@@ -80,7 +82,13 @@ const Home = () => {
             <div className="swiper">
               <div className="swiper-wrapper">
                 <div className="swiper-slide">
-                  <a href="#" onClick={(e) => { e.preventDefault(); handleBookClick(1); }}>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleBookClick(1);
+                    }}
+                  >
                     <img
                       src="https://pic.neungyule.com/nebuildandgrow/mobile/phonicscode/cover1.jpg"
                       alt="Phonics Code 1"
@@ -88,7 +96,13 @@ const Home = () => {
                   </a>
                 </div>
                 <div className="swiper-slide">
-                  <a href="#" onClick={(e) => { e.preventDefault(); handleBookClick(2); }}>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleBookClick(2);
+                    }}
+                  >
                     <img
                       src="https://pic.neungyule.com/nebuildandgrow/mobile/phonicscode/cover2.jpg"
                       alt="Phonics Code 2"
@@ -96,7 +110,13 @@ const Home = () => {
                   </a>
                 </div>
                 <div className="swiper-slide">
-                  <a href="#" onClick={(e) => { e.preventDefault(); handleBookClick(3); }}>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleBookClick(3);
+                    }}
+                  >
                     <img
                       src="https://pic.neungyule.com/nebuildandgrow/mobile/phonicscode/cover3.jpg"
                       alt="Phonics Code 3"
@@ -104,7 +124,13 @@ const Home = () => {
                   </a>
                 </div>
                 <div className="swiper-slide">
-                  <a href="#" onClick={(e) => { e.preventDefault(); handleBookClick(4); }}>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleBookClick(4);
+                    }}
+                  >
                     <img
                       src="https://pic.neungyule.com/nebuildandgrow/mobile/phonicscode/cover4.jpg"
                       alt="Phonics Code 4"
@@ -112,7 +138,13 @@ const Home = () => {
                   </a>
                 </div>
                 <div className="swiper-slide">
-                  <a href="#" onClick={(e) => { e.preventDefault(); handleBookClick(5); }}>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleBookClick(5);
+                    }}
+                  >
                     <img
                       src="https://pic.neungyule.com/nebuildandgrow/mobile/phonicscode/cover5.jpg"
                       alt="Phonics Code 5"
